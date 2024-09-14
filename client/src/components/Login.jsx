@@ -1,9 +1,12 @@
 import axios from 'axios'
-import React, { useState } from 'react'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import Swal from 'sweetalert2'
 
 const BASE_URL = 'http://localhost:5000'
 
 export default function Login() {
+    const navigate = useNavigate()
     const [login, setLogin] = useState({
         email: '',
         password: ''
@@ -20,30 +23,39 @@ export default function Login() {
     async function loginUser(event) {
         event.preventDefault(); // ป้องกันการรีเฟรชหน้าเมื่อ submit ฟอร์ม
         try {
-            const response = await axios.post(`${BASE_URL}/api/login`, {
-                email: login.email,
-                password: login.password
-            }, {
+            const response = await axios.post(`${BASE_URL}/auth/login`, login, {
                 withCredentials: true
             })
-            console.log(response.data);
-            window.location = '/'
+
+            if (response.data.isAuthenticated) {
+                Swal.fire({
+                    title: 'Login Successful',
+                    text: `Welcome back, ${response.data.name}!`,
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    navigate('/')
+                })
+            } else {
+                Swal.fire({
+                    title: 'Login Failed',
+                    text: response.data.message,
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
         } catch (error) {
-            console.log(error);
+            console.log('Error logging in:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
         }
     }
 
-    const getUsers = async () => {
-        try {
-            // const authToken = localStorage.getItem('token');
-            const response = await axios.get(`${BASE_URL}/api/users`, {
-                withCredentials: true
-            })
-            console.log('user data', response.data);
-        } catch (error) {
-            console.log('error', error);
-        }
-    }
 
 
     return (
@@ -91,9 +103,6 @@ export default function Login() {
                                 <button type='submit' className="btn btn-primary">Login</button>
                             </div>
                         </form>
-                        <div className="mx-auto pb-4">
-                            <button onClick={getUsers} className="btn btn-primary">get users</button>
-                        </div>
                     </div>
                 </div>
             </div>

@@ -1,6 +1,19 @@
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import axios from 'axios';
 
 function Navbar() {
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        try {
+            await axios.post('http://localhost:5000/auth/logout', {}, { withCredentials: true });
+            navigate('/login');
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
+    };
+
     return (
         <>
             <div className="navbar bg-primary text-primary-content justify-between">
@@ -50,7 +63,7 @@ function Navbar() {
                             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
                             <li><a>Profile</a></li>
                             <li><a>Settings</a></li>
-                            <li><Link to={"/login"}>Logout</Link></li>
+                            <li><a onClick={handleLogout}>Logout</a></li>
                         </ul>
                     </div>
                 </div>
