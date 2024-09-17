@@ -4,6 +4,8 @@ import { MdAccountCircle, MdOutlineDashboard } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
+const BASE_URL = 'http://localhost:5000';
+
 const Sidebar = () => {
     const [userData, setUserData] = useState("");
 
@@ -11,7 +13,7 @@ const Sidebar = () => {
 
     const fetchCookie = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api');
+            const response = await axios.get(`${BASE_URL}/api`);
             const results = response.data.user;
             if (results) {
                 setUserData(results);
@@ -48,7 +50,10 @@ const Sidebar = () => {
                     <div className="flex items-center p-4 bg-primary text-primary-content rounded-lg">
                         <div className="avatar">
                             <div className="w-10 h-10 rounded-full">
-                                <img src="https://via.placeholder.com/100" alt="User" />
+                                <img src={userData.image ||
+                                    `https://ui-avatars.com/api/?name=${userData.name}&size=150`}
+                                    alt="Profile"
+                                />
                             </div>
                         </div>
                         <div className="ml-3">

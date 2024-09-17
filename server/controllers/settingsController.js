@@ -1,23 +1,17 @@
 const conn = require('../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const secret = process.env.JWT_SECRET
 require('dotenv').config();
+
+const secret = process.env.JWT_SECRET
 
 // Controller function to update user settings
 const updateSettings = async (req, res) => {
     const { currentPassword, newPassword } = req.body;
 
-    // Check if the user is authenticated and has a valid ID
-    const authToken = req.cookies.token
-
-    if (!authToken) {
-        return res.status(404).json({ message: 'Cookie not found' });
-    }
-
     try {
-        const decoded = jwt.verify(authToken, secret)
-        const userId = decoded.id
+        // req.user มาจาก middleware verifyToken
+        const userId = req.user.id;
 
         if (!userId) {
             return res.status(401).json({ message: 'Unauthorized' });

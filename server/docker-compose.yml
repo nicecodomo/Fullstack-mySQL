@@ -1,23 +1,23 @@
 version: '3.8'
 
 services:
-  node-app:
-    container_name: node-app
-    build: .
-    ports:
-      - '5000:5000'
-    volumes:
-      - .:/app
-      - /app/node_modules
-    depends_on:
-      - db
-    environment:
-      - DB_HOST=db
-      - DB_USER=root
-      - DB_PASSWORD=root
-      - DB_NAME=tutorial
-    networks:
-      - app-network
+  # node-app:
+  #   container_name: node-app
+  #   build: .
+  #   ports:
+  #     - '5000:5000'
+  #   volumes:
+  #     - .:/app
+  #     - /app/node_modules
+  #   depends_on:
+  #     - db
+  #   environment:
+  #     - DB_HOST=db
+  #     - DB_USER=root
+  #     - DB_PASSWORD=root
+  #     - DB_NAME=tutorial
+  #   networks:
+  #     - app-network
 
   db:
     container_name: mysql-db
@@ -30,6 +30,8 @@ services:
       - db-data:/var/lib/mysql
     networks:
       - app-network
+    ports:
+      - '3306:3306'
 
   phpmyadmin:
     container_name: phpmyadmin

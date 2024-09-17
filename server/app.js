@@ -2,9 +2,11 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
-const authRoutes = require('./routes/authRoutes');
-const userRoutes = require('./routes/userRoutes');
-const settingsRoutes = require('./routes/settingsRoutes');
+const authRoutes = require('./routes/auth.routes');
+const userRoutes = require('./routes/user.routes');
+const settingsRoutes = require('./routes/settings.routes');
+const employee = require('./routes/employee.routes');
+const path = require('path');
 
 // ตั้งค่า middleware
 app.use(express.json())
@@ -16,15 +18,18 @@ app.use(cors({
 app.use(cookieParser())
 require('dotenv').config();
 
-const port = process.env.PORT
 
 // ใช้เส้นทาง
 app.use('/auth', authRoutes);
 app.use('/api', userRoutes);
 app.use('/settings', settingsRoutes);
-// app.use('/api', authRoutes);
-// app.use('/api/user', userRoutes);
+app.use('/api/emp', employee);
 
-app.listen(port, async () => {
+// สร้างโฟลเดอร์สำหรับเก็บรูป
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+const port = process.env.PORT
+
+app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);
 })

@@ -6,26 +6,26 @@ import { Link } from 'react-router-dom';
 const BASE_URL = 'http://localhost:5000';
 
 function Index() {
-    const [users, setUsers] = useState([]);
+    const [employees, setEmployees] = useState([]);
 
     useEffect(() => {
-        const fetchUsers = async () => {
+        const fetchEmployees = async () => {
             try {
-                const response = await axios.get(`${BASE_URL}/api/users`); // ตัวอย่าง API สำหรับดึงข้อมูลผู้ใช้
+                const response = await axios.get(`${BASE_URL}/api/emp`); // ตัวอย่าง API สำหรับดึงข้อมูล emp
                 // ตรวจสอบว่าข้อมูลที่ได้รับเป็น array
                 if (Array.isArray(response.data)) {
-                    setUsers(response.data);
+                    setEmployees(response.data);
                 } else {
                     console.error("Data is not an array:", response.data);
                     // อาจจะตั้งค่าให้เป็น array เปล่าเพื่อป้องกันข้อผิดพลาด
-                    setUsers([]);
+                    setEmployees([]);
                 }
             } catch (error) {
-                console.error("Error fetching users:", error);
+                console.error("Error fetching employees:", error);
             }
         };
 
-        fetchUsers();
+        fetchEmployees();
     }, []);
 
     const handleDelete = (id) => {
@@ -39,10 +39,10 @@ function Index() {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    await axios.delete(`${BASE_URL}/api/users/${id}`);
-                    setUsers(users.filter(user => user.id !== id));
+                    await axios.delete(`${BASE_URL}/api/emp/${id}`);
+                    setEmployees(employees.filter(emp => emp.emp_id !== id));
                 } catch (error) {
-                    Swal.fire('Error!', 'There was an error deleting the user.', 'error');
+                    Swal.fire('Error!', 'There was an error deleting the employee.', 'error');
                 }
             }
         });
@@ -51,37 +51,52 @@ function Index() {
 
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">User Management</h1>
+            <h1 className="text-2xl font-bold mb-4">Employee Management</h1>
             <div className="mb-4">
-                <Link to="/add-edit-user" className="btn btn-primary">Add User</Link>
+                <Link to="/add-edit-emp" className="btn btn-primary">Add Employee</Link>
             </div>
             <div className="overflow-x-auto">
                 <table className="table w-full">
                     <thead>
                         <tr>
                             <th>#</th>
+                            <th>Image</th>
                             <th>Name</th>
-                            <th>Email</th>
+                            <th>Age</th>
+                            <th>Phone</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {users.length > 0 ? (
-                            users.map((user, index) => (
-                                <tr key={user.id}>
+                        {employees.length > 0 ? (
+                            employees.map((emp, index) => (
+                                <tr key={emp.emp_id}>
                                     <td>{ index + 1 }</td>
-                                    <td>{user.name}</td>
-                                    <td>{user.email}</td>
+                                    <td>
+                                        {/* แสดงรูปภาพ */}
+                                        {emp.image ? (
+                                            <img
+                                                src={`${BASE_URL}/uploads/${emp.image}`}
+                                                alt={emp.name}
+                                                className="w-16 h-16 object-cover rounded-full"
+                                            />
+                                        ) : (
+                                            <img src={`https://ui-avatars.com/api/?rounded=true&name=${emp.name}`}></img>
+                                        )}
+                                    </td>
+                                    <td>{emp.name}</td>
+                                    <td>{emp.age}</td>
+                                    <td>{emp.phone}</td>
                                     <td>
                                         <Link
-                                            to={`/add-edit-user/${user.id}`}
+                                            to={`/add-edit-emp/${emp.emp_id}`}
                                             className="btn btn-info btn-sm mr-2"
                                         >
                                             Edit
                                         </Link>
                                         <button
                                             className="btn btn-error btn-sm"
-                                            onClick={() => handleDelete(user.id)}
+                                            onClick={() => handleDelete(emp.emp_id)}
                                         >
                                             Delete
                                         </button>
@@ -90,7 +105,7 @@ function Index() {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="3" className="text-center">No users found</td>
+                                <td colSpan="3" className="text-center">No employees found</td>
                             </tr>
                         )}
                     </tbody>
