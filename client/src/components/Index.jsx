@@ -5,21 +5,42 @@ import { Link } from 'react-router-dom';
 
 const BASE_URL = 'http://localhost:5000';
 
+// ฟังก์ชันคำนวณอายุจากวันเกิด
+const calculateAge = (dob) => {
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+
+    // ตรวจสอบเดือนและวันเกิด ว่าเกิดก่อนวันหรือไม่
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    return age;
+};
+
 function Index() {
     const [employees, setEmployees] = useState([]);
 
     useEffect(() => {
         const fetchEmployees = async () => {
             try {
-                const response = await axios.get(`${BASE_URL}/api/emp`); // ตัวอย่าง API สำหรับดึงข้อมูล emp
+                const response = await axios.get(`${BASE_URL}/api/emp`);
+
                 // ตรวจสอบว่าข้อมูลที่ได้รับเป็น array
                 if (Array.isArray(response.data)) {
-                    setEmployees(response.data);
+                    // แปลง dob ให้เป็นรูปแบบ YYYY-MM-DD ก่อนที่จะนำไปใช้
+                    const employeesWithFormattedDob = response.data.map(emp => ({
+                        ...emp,
+                        dob: new Date(emp.dob).toISOString().split('T')[0] // แยกเอาเฉพาะวันที่
+                    }));
+                    setEmployees(employeesWithFormattedDob)
                 } else {
                     console.error("Data is not an array:", response.data);
-                    // อาจจะตั้งค่าให้เป็น array เปล่าเพื่อป้องกันข้อผิดพลาด
+                    // ตั้งค่าให้เป็น array เปล่าเพื่อป้องกันข้อผิดพลาด
                     setEmployees([]);
                 }
+
             } catch (error) {
                 console.error("Error fetching employees:", error);
             }
@@ -71,7 +92,7 @@ function Index() {
                         {employees.length > 0 ? (
                             employees.map((emp, index) => (
                                 <tr key={emp.emp_id}>
-                                    <td>{ index + 1 }</td>
+                                    <td>{index + 1}</td>
                                     <td>
                                         {/* แสดงรูปภาพ */}
                                         {emp.image ? (
@@ -85,7 +106,7 @@ function Index() {
                                         )}
                                     </td>
                                     <td>{emp.name}</td>
-                                    <td>{emp.age}</td>
+                                    <td>{calculateAge(emp.dob)}</td>
                                     <td>{emp.phone}</td>
                                     <td>
                                         <Link
